@@ -1,0 +1,400 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script defer src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script defer type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <title>Victim Analysis</title>
+</head>
+<style>
+        .crimeList{
+        box-shadow: 0px 0px 10px;
+        padding: 10px;
+        border-radius: 10px;
+
+    }
+
+    .main{
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        row-gap: 50px;
+        overflow: auto;
+        padding: 25px 0px;
+    }
+    body{
+        gap: 0px;
+
+    }
+    .analysisInput,.select-option{
+        background-color: white;
+        color: black;
+    }
+    .analysisInput{
+        width: 45%;
+        height: 58%;
+    }
+
+
+    .crimeList{
+        width: 45%; height: 400px
+
+    }
+    @media (max-width:600px) {
+        .analysisInput{
+            width: 90%;
+        }   
+        .crimeList{
+            width: 90%;
+        }
+        
+    }
+
+</style>
+<body>
+    <header class="bg-dark">
+        <div style="display: flex;gap:10px;align-items: center;">
+            
+            <button class="backButton" onclick="history.back()">&#x25c0;</button>
+            <h1 class="text-white">Victim Analysis</h1>
+        </div>
+        <!-- <header class="navbar navbar-dark bg-dark" style="z-index: 10000;">
+            <div class="container-fluid">
+                <div style="display: flex;gap:10px;align-items: center;">
+                    <button class="backButton" onclick="history.back()">&#x25c0;</button>
+                    <h1 class="text-white">Victim Analysis</h1>
+                </div>  
+                <div>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>        
+              <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+                <div class="offcanvas-header">
+                  <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+              </div>
+            </div>
+        </header> -->
+
+
+    </header>
+    <!-- Display the column chart -->
+    <main class="main">
+
+        <form class="analysisInput" action="{{url_for('victimAnalysis1')}}" method="post">
+
+            <div class="select-option p-2 bg">
+                <label for="district">Select District:</label>
+                <select id="districts" class="select-option" name="district">
+                    <option value="">ALL</option>
+                    {%for i in districts%}
+                        <option value="{{i}}">{{i}}</option>
+                    {%endfor%}
+                </select>
+            </div>
+
+            <div class="select-option p-2">
+                <label for="places">Select places:</label>
+                <select class="select-option" id="places" name="places" >
+                    <option value="">All</option>
+
+                </select>
+            </div>
+
+            <button class="btn btn-primary btn-lg submit-btn " style="border-radius: 0px;">Submit</button>
+
+            </form>
+
+        <div class="crimeList"  id="gender_chart" ></div>
+
+        <div class="crimeList"  id="profession_chart" ></div>
+    
+        <div class="crimeList"  id="cas_chart" ></div>
+
+        <div class="crimeList"  id="unit_chart" ></div>
+
+        <div class="crimeList"  id="dist_chart" ></div>
+
+
+        <div id="map" class="crimeList" ></div>
+
+
+    </main>
+
+<script>
+            google.charts.load("current", {packages:['corechart']});
+        google.charts.setOnLoadCallback(drawCharts);
+
+        function drawCharts() {
+            var casteData = {{ sexVal | safe }};
+            var casteLabels = {{ sexIdx | safe }};
+            var ageData = {{ profVal | safe }};
+            var ageLabels = {{ profIdx | safe }};
+            var professionData={{casVal|safe}}
+            var professionLabels={{casIdx|safe}}
+            var unitData={{unitVal|safe}}
+            var unitLabels={{unitIdx|safe}}
+            var distData={{distVal|safe}}
+            var distLabels={{distIdx|safe}}
+
+            console.log(casteData);
+            console.log(casteLabels);
+            // console.log(ageData);
+            // console.log(ageLabels);
+
+            // Prepare data for caste chart
+
+
+            var data = google.visualization.arrayToDataTable([
+          ['Task', 'Hours per Day'],
+          [casteLabels[0],  casteData[0]],
+          [casteLabels[1],  casteData[1]],
+          [casteLabels[2],  casteData[2]],
+
+        ]);
+
+        var options = {
+          title: 'My Daily Activities'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('gender_chart'));
+
+        chart.draw(data, options);
+
+            // Prepare data for age chart
+            var ageChartData = google.visualization.arrayToDataTable([
+                ["Age Group", "Cases", { role: "style" } ],
+                [ageLabels[0], ageData[0], "#b87333"],
+                [ageLabels[1], ageData[1], "silver"],
+                [ageLabels[2],ageData[2], "gold"],
+                [ageLabels[3],ageData[3], "color: #e5e4e2"],
+                [ageLabels[4],ageData[4], "color: blue"],
+                [ageLabels[5],ageData[5], "color: green"],
+                [ageLabels[6],ageData[6], "color: RED"],
+                [ageLabels[7],ageData[7], "color: purple"],
+                [ageLabels[8],ageData[8], "color: black"],
+                [ageLabels[9],ageData[9], "color: tomato"],
+                [ageLabels[10],ageData[10], "color: orange"],
+                // Add more rows as needed
+            ]);
+
+            var ageChartOptions = {
+                title: "Profession Analysis",
+                width: '100%',
+                height: '100%',
+                bar: {groupWidth: "95%"},
+                legend: { position: "none" },
+                backgroundColor: "white"
+            };
+
+            // Draw age chart
+            var ageChart = new google.visualization.BarChart(document.getElementById("profession_chart"));
+            ageChart.draw(ageChartData, ageChartOptions);
+        
+
+        var ageChartData = google.visualization.arrayToDataTable([
+                ["Age Group", "Cases", { role: "style" } ],
+                [professionLabels[0], professionData[0], "#b87333"],
+                [professionLabels[1], professionData[1], "silver"],
+                [professionLabels[2],professionData[2], "gold"],
+                [professionLabels[3],professionData[3], "color: #e5e4e2"],
+                [professionLabels[4],professionData[4], "color: blue"],
+                [professionLabels[5],professionData[5], "color: green"],
+                [professionLabels[6],professionData[6], "color: RED"],
+                [professionLabels[7],professionData[7], "color: purple"],
+                [professionLabels[8],professionData[8], "color: black"],
+                [professionLabels[9],professionData[9], "color: tomato"],
+                [professionLabels[10],professionData[10], "color: orange"],
+                // Add more rows as needed
+            ]);
+
+            var ageChartOptions = {
+                title: "Cast Analysis",
+                width: '100%',
+                height: '100%',
+                bar: {groupWidth: "95%"},
+                legend: { position: "none" },
+                backgroundColor: "white"
+            };
+
+            // Draw age chart
+            var ageChart = new google.visualization.BarChart(document.getElementById("cas_chart"));
+            ageChart.draw(ageChartData, ageChartOptions);
+
+
+
+
+            var ageChartData = google.visualization.arrayToDataTable([
+                ["Age Group", "Cases", { role: "style" } ],
+                [unitLabels[0], unitData[0], "#b87333"],
+                [unitLabels[1], unitData[1], "silver"],
+                [unitLabels[2],unitData[2], "gold"],
+                [unitLabels[3],unitData[3], "color: #e5e4e2"],
+                [unitLabels[4],unitData[4], "color: blue"],
+                [unitLabels[5],unitData[5], "color: green"],
+                [unitLabels[6],unitData[6], "color: RED"],
+                [unitLabels[7],unitData[7], "color: purple"],
+                [unitLabels[8],unitData[8], "color: black"],
+                [unitLabels[9],unitData[9], "color: tomato"],
+                [unitLabels[10],unitData[10], "color: orange"],
+                // Add more rows as needed
+            ]);
+
+            var ageChartOptions = {
+                title: "Place Analysis",
+                width: '100%',
+                height: '100%',
+                bar: {groupWidth: "95%"},
+                legend: { position: "none" },
+                backgroundColor: "white"
+            };
+
+            // Draw age chart
+            var ageChart = new google.visualization.BarChart(document.getElementById("unit_chart"));
+            ageChart.draw(ageChartData, ageChartOptions);
+
+
+
+
+
+
+
+
+
+
+            var ageChartData = google.visualization.arrayToDataTable([
+                ["Age Group", "Cases", { role: "style" } ],
+                [distLabels[0], distData[0], "#b87333"],
+                [distLabels[1], distData[1], "silver"],
+                [distLabels[2],distData[2], "gold"],
+                [distLabels[3],distData[3], "color: #e5e4e2"],
+                [distLabels[4],distData[4], "color: blue"],
+                [distLabels[5],distData[5], "color: green"],
+                [distLabels[6],distData[6], "color: RED"],
+                [distLabels[7],distData[7], "color: purple"],
+                [distLabels[8],distData[8], "color: black"],
+                [distLabels[9],distData[9], "color: tomato"],
+                [distLabels[10],distData[10], "color: orange"],
+                // Add more rows as needed
+            ]);
+
+            var ageChartOptions = {
+                title: "District Analysis",
+                width: '100%',
+                height: '100%',
+                bar: {groupWidth: "95%"},
+                legend: { position: "none" },
+                backgroundColor: "white"
+            };
+
+            // Draw age chart
+            var ageChart = new google.visualization.BarChart(document.getElementById("dist_chart"));
+            ageChart.draw(ageChartData, ageChartOptions);
+
+
+        }
+
+
+
+
+
+
+
+// Create a map centered around Karnataka
+var map = L.map('map').setView([13.9716, 77.5946], 6);
+
+// Add OpenStreetMap base layer to the map
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+// Sample points in Karnataka with number of crimes
+var points = {{ points | tojson }};
+
+// Array to store coordinates of points
+var pointCoordinates = [];
+
+// Function to calculate marker color based on number of crimes
+function getMarkerColor(crimes) {
+    var opacity = Math.min(crimes / 100, 1); // Normalize crimes to range 0-100
+    console.log(crimes)
+    var color = 'rgba(255, 0, 0, ' + opacity + ')'; // Red color with opacity
+    return color;
+}
+
+// Plot the points on the map and collect coordinates
+points.forEach(point => {
+    var markerColor = getMarkerColor(point.crimes);
+    L.marker(point.coordinates, { icon: L.divIcon({ html: '<div style="background-color: ' + "red" + '; width: 25px; height: 25px; border-radius: 50%;"></div>' }) }).addTo(map)
+        .bindPopup(point.name + '<br>Crimes: ' + point.crimes);
+    pointCoordinates.push(point.coordinates); // Collect coordinates
+});
+
+// Fit the map to the bounds of the points
+var bounds = L.latLngBounds(pointCoordinates);
+map.fitBounds(bounds);
+
+
+
+document.getElementById('districts').addEventListener('change', function() {
+    var selectedOption = this.value;
+    fetch('/process_data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({selectedOption: selectedOption})
+    })
+    .then(response => response.json())
+    .then(data => {
+        var secondDropdown = document.getElementById('places');
+        secondDropdown.innerHTML = '                    <option value="">All</option>'; // Clear previous options
+        data.forEach(option => {
+            var optionElement = document.createElement('option');
+            optionElement.textContent = option;
+            optionElement.value=this.value+","+option;
+            secondDropdown.appendChild(optionElement);
+        });
+    });
+});
+
+document.getElementById('districts').addEventListener('change', function() {
+    var selectedOption = this.value;
+    fetch('/process_crimeType_data1', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({selectedOption:selectedOption})
+    })
+    .then(response => response.json())
+    .then(data => {
+        var secondDropdown = document.getElementById('crimeType');
+        secondDropdown.innerHTML = '                    <option value="">All</option>'; // Clear previous options
+        data.forEach(option => {
+            var optionElement = document.createElement('option');
+            optionElement.textContent = option;
+            optionElement.value=option;
+            secondDropdown.appendChild(optionElement);
+        });
+    });
+});
+
+
+
+</script>
+
+</body>
+</html>
