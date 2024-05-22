@@ -4,8 +4,8 @@
 <h2>Download the CSV and include in this folder</h2>
 <a href="https://drive.google.com/file/d/1iCvyzlVHNSP6cdhdMkhvkIVy3OP3tFBA/view?usp=sharing">Click here to download CSV</a>
 <br>
-<ul>
   <h2>Install the packages</h2>
+<ul>
   <li> flask</li>
   <li>numpy</li>
   <li>pandas</li>
