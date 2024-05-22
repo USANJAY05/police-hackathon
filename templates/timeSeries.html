@@ -42,7 +42,7 @@
 <body>
     <header class="bg-dark">
         <div style="display: flex;gap:10px;align-items: center;">
-            <button class="backButton" onclick="history.back()">&#x25c0;</button>
+            <button class="backButton" onclick="location.href='/'">&#x25c0;</button>
             <h1 class="text-white">Time Series</h1>
         </div>
 
@@ -68,6 +68,8 @@
 
     function drawChart() {
         var crimeData = {{ data|safe }};
+        var error={{error|safe}}
+        console.log(error)
 
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Year');

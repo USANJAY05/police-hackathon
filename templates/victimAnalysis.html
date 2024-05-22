@@ -14,6 +14,10 @@
     <title>Victim Analysis</title>
 </head>
 <style>
+    header{
+        position: fixed;
+        width: 100%;
+    }
         .crimeList{
         box-shadow: 0px 0px 10px;
         padding: 10px;
@@ -22,18 +26,17 @@
     }
 
     .main{
+        margin-top: 90px;
         width: 100%;
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: space-around;
-        row-gap: 50px;
-        overflow: auto;
-        padding: 25px 0px;
+        padding: 20px 0px;
+        row-gap: 40px;
     }
     body{
-        gap: 0px;
-
+        overflow: auto;
     }
     .analysisInput,.select-option{
         background-color: white;
@@ -64,29 +67,9 @@
     <header class="bg-dark">
         <div style="display: flex;gap:10px;align-items: center;">
             
-            <button class="backButton" onclick="history.back()">&#x25c0;</button>
+            <button class="backButton" onclick="location.href='/'">&#x25c0;</button>
             <h1 class="text-white">Victim Analysis</h1>
         </div>
-        <!-- <header class="navbar navbar-dark bg-dark" style="z-index: 10000;">
-            <div class="container-fluid">
-                <div style="display: flex;gap:10px;align-items: center;">
-                    <button class="backButton" onclick="history.back()">&#x25c0;</button>
-                    <h1 class="text-white">Victim Analysis</h1>
-                </div>  
-                <div>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                </div>        
-              <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
-                <div class="offcanvas-header">
-                  <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5>
-                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-              </div>
-            </div>
-        </header> -->
-
 
     </header>
     <!-- Display the column chart -->

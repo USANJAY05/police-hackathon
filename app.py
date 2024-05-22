@@ -2,6 +2,7 @@ from flask import Flask, render_template,url_for,request,jsonify
 import pandas as pd
 import json
 import numpy as np
+import datetime
 import pickle
 from datetime import datetime as dt
 import matplotlib.pyplot as plt
@@ -42,8 +43,8 @@ def filter_dataframe(df, district=None, unit=None, crimetype=None, month=None, y
     time=filtered_df.Offence_Time
     village=filtered_df.Village_Area_Name
     crr1=filtered_df['CrimeGroup_Name'].iloc[:]
-    # print('crr',crr)
-    # print('crr unique',crr.unique())
+    # #print('crr',crr)
+    # #print('crr unique',crr.unique())
     crr=crr1.value_counts().head().index.to_list()
     crr.append('Others')
     crime_count=crr1.value_counts().head().values.tolist()
@@ -61,21 +62,21 @@ def filter_dataframe(df, district=None, unit=None, crimetype=None, month=None, y
         dic['crime']=1
         lis.append([crime.iloc[i],time.iloc[i],date.iloc[i],village.iloc[i]])
         map.append(dic)
-    # print("Qqqaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    # print(lis)
-    # print("Qqqaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    # #print("Qqqaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    # #print(lis)
+    # #print("Qqqaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
-    # print(filtered_df[['District_Name','UnitName','Village_Area_Name','Offence_Date','Offence_Time']].iloc[:250,:])
+    # #print(filtered_df[['District_Name','UnitName','Village_Area_Name','Offence_Date','Offence_Time']].iloc[:250,:])
     ss=len(map)
-    # print(map,lis,ss,crr)
-    # print('aa',crr)
-    print(crime_count)
+    # #print(map,lis,ss,crr)
+    # #print('aa',crr)
+    #print(crime_count)
     return map,lis,ss,crr,crime_count
  
 
 app=Flask(__name__)
 
-# print(filter_dataframe(pf)[0])
+# #print(filter_dataframe(pf)[0])
 
 
 
@@ -108,10 +109,10 @@ def crimeTypeList(df, district=None, unit=None):
         filtered_df = filtered_df[filtered_df['District_Name'] == district]
 
     a=filtered_df['CrimeGroup_Name'].iloc[:250]
-    # print('unique',a.unique())
+    # #print('unique',a.unique())
     a=a.value_counts().head().index.to_list()
     a.append('Others')
-    # print('a',a)
+    # #print('a',a)
     return a
  
 
@@ -119,24 +120,15 @@ def crimeTypeList(df, district=None, unit=None):
 
 @app.route('/')
 def combined_route():
-#     data = [
-#     {'name': 'Bagalkot', 'coordinates': [15.8929852, 75.6571751], 'crime': 1},
-#     {'name': 'Bagalkot', 'coordinates': [15.9111875, 75.5029201], 'crime': 1}
-# ]
-
-# # Convert data to GeoDataFrame
-#     geometry = [Point(xy) for xy in [(d['coordinates'][1], d['coordinates'][0]) for d in data]]
-#     crimes = [d['crime'] for d in data]
-#     gdf = gpd.GeoDataFrame({'crime': crimes}, geometry=geometry)
 
     all = filter_dataframe(pf)
     totalCrimes = all[2]
     second_route_data = all[0]
     mapLatLong = all[0] # Example data, replace with your actual data 
-    # print(totalCrimes) 
-    # print("**************************************************************************************************************")
-    # # print(mapLatLong)
-    # print(all[4])
+    # #print(totalCrimes) 
+    # #print("**************************************************************************************************************")
+    # # #print(mapLatLong)
+    # #print(all[4])
 
     # Convert int64 objects to Python int before serialization
     crime_count = [int(count) for count in all[4]]
@@ -187,21 +179,21 @@ def process_data():
 def process_crimeType_data1():
     selected_option = request.json['selectedOption'] 
     crime_types =  crimeTypeList(pf, selected_option)
-    # print(selected_option)
-    # print(crime_types)
+    # #print(selected_option)
+    # #print(crime_types)
     return jsonify(crime_types) 
 
 @app.route('/process_crimeType_data2', methods=['POST'])
 def process_crimeType_data2():
     selected_option = request.json['selectedOption'] 
-    # print(selected_option)
-    # print(" **************************************************************************************")
+    # #print(selected_option)
+    # #print(" **************************************************************************************")
  
     district,place=selected_option.split(",")
-    # print(district,place)
+    # #print(district,place)
     crime_types = crimeTypeList(pf, district,place)
-    # print(crime_types)
-    # print(selected_option)
+    # #print(crime_types)
+    # #print(selected_option)
     return jsonify(crime_types) 
  
  
@@ -224,13 +216,13 @@ def crimeType():
     else:
         places=place_name.split(',')
         place=places[1]
-    # print("District:", district_name)
-    # print("Places:", place)
-    # print("Crime Types:", crime_types)
-    print("***************************************************************************************")
+    # #print("District:", district_name)
+    # #print("Places:", place)
+    # #print("Crime Types:", crime_types)
+    #print("***************************************************************************************")
     all=filter_dataframe(pf,district_name,place,crime_types)
 
-    # print(all)    
+    # #print(all)    
 
     # Convert int64 objects to Python int before serialization
     crime_count = [int(count) for count in all[4]]
@@ -241,21 +233,18 @@ def crimeType():
     # Now you can serialize crime_count to JSON 
     crime_count_json = json.dumps(crime_count)
 
-    print("!!!!!!!!!!!!!!!!!!!!!!!",all[3],"!!!!!!!!!!!!!!!!!!!")
+    #print("!!!!!!!!!!!!!!!!!!!!!!!",all[3],"!!!!!!!!!!!!!!!!!!!")
 
 
     crime=[[count] for count in all[3]]
     crime = [int(count) if isinstance(count, np.int64) else count for count in all[3]]
 
     crime=json.dumps(crime)
-    print(crime)
+    #print(crime)
     
     return render_template("index.html", districts=dir,crime=all[3],crimeBar=crime, crimeCount=sum(all[4]),crime_list=all[1],crime5=all[4],points=all[0],chart=crime_count_json)
 
-import pandas as pd 
-import numpy as np
-import json
-from flask import Flask, render_template
+
 
 @app.route('/AccusedAnalysis')
 def accusedAnalysis():
@@ -268,8 +257,8 @@ def accusedAnalysis():
     caste = ss['Caste_x'].value_counts().iloc[:10]
     caste_counts=caste.values.tolist()
     caste_name=caste.index.to_list()
-    print(caste_counts)
-    print(caste_name)
+    #print(caste_counts)
+    #print(caste_name)
     casteCount=[int(count) for count in caste_counts]
     casteCount = [int(count) if isinstance(count, np.int64) else count for count in caste_counts]
     # Now you can serialize crime_count to JSON 
@@ -281,7 +270,7 @@ def accusedAnalysis():
     age=ss.agegrp.value_counts().iloc[:10] 
     ageidx=age.index.tolist()
     ageval=age.values.tolist()
-    print(ageidx,ageval)
+    #print(ageidx,ageval)
     age_idx=[count for count in ageidx]
     age_idx = [count if isinstance(count, np.int64) else count for count in ageidx]
     age_idx_json=json.dumps(age_idx)
@@ -293,7 +282,7 @@ def accusedAnalysis():
     profession=ss.Profession_x.value_counts().iloc[:10]
     professionidx=profession.index.tolist()
     professionval=profession.values.tolist()
-    print(professionidx,professionval)
+    #print(professionidx,professionval)
     profession_idx=[count for count in professionidx]
     profession_idx = [count if isinstance(count, np.int64) else count for count in professionidx]
     # profession_idx_json=json.dumps(profession_idx)
@@ -324,13 +313,13 @@ def accusedAnalysis1():
             df=df[df['UnitName']==unit]
         return df
     ss=function(ss,dt,place)
-    print(ss)
+    #print(ss)
     # Get the top 20 caste counts and convert them to a list
     caste = ss['Caste_x'].value_counts().iloc[:10]
     caste_counts=caste.values.tolist()
     caste_name=caste.index.to_list()
-    # print(caste_counts)
-    # print(caste_name)
+    # #print(caste_counts)
+    # #print(caste_name)
     casteCount=[int(count) for count in caste_counts]
     casteCount = [int(count) if isinstance(count, np.int64) else count for count in caste_counts]
     # Now you can serialize crime_count to JSON 
@@ -342,7 +331,7 @@ def accusedAnalysis1():
     age=ss.agegrp.value_counts().iloc[:10] 
     ageidx=age.index.tolist()
     ageval=age.values.tolist()
-    # print(ageidx,ageval)
+    # #print(ageidx,ageval)
     age_idx=[count for count in ageidx]
     age_idx = [count if isinstance(count, np.int64) else count for count in ageidx]
     age_idx_json=json.dumps(age_idx)
@@ -354,7 +343,7 @@ def accusedAnalysis1():
     profession=ss.Profession_x.value_counts().iloc[:10]
     professionidx=profession.index.tolist()
     professionval=profession.values.tolist()
-    # print(professionidx,professionval)
+    # #print(professionidx,professionval)
     profession_idx=[count for count in professionidx]
     profession_idx = [count if isinstance(count, np.int64) else count for count in professionidx]
     # profession_idx_json=json.dumps(profession_idx)
@@ -372,9 +361,9 @@ def accusedAnalysis1():
 def victimAnalysis():
     ls=pf[['District_Name', 'UnitName', 'FIRNo', 'Year', 'Month', 'VictimName']]
     sex_distribution = pf['Sex'].value_counts()
-    print("***************")
-    print(sex_distribution)
-    print("******************")
+    #print("***************")
+    #print(sex_distribution)
+    #print("******************")
 
 
 
@@ -389,8 +378,8 @@ def victimAnalysis():
     sex_idx=[[count] for count in sexidx] 
     sex_idx = [int(count) if isinstance(count, np.int64) else count for count in sexidx]
 
-    print(sex_val) 
-    print(sex_idx)
+    #print(sex_val) 
+    #print(sex_idx)
 
 
     prof=pf.Profession_x.value_counts().iloc[:10]
@@ -437,8 +426,8 @@ def victimAnalysis():
     unit_idx=[[count] for count in unitidx] 
     unit_idx = [int(count) if isinstance(count, np.int64) else count for count in unitidx]
 
-    print(unit_idx)
-    print(unit_val)
+    #print(unit_idx)
+    #print(unit_val)
 
 
 
@@ -454,8 +443,8 @@ def victimAnalysis():
     dist_idx=[[count] for count in distidx] 
     dist_idx = [int(count) if isinstance(count, np.int64) else count for count in distidx]
 
-    print(dist_idx)
-    print(dist_val)
+    #print(dist_idx)
+    #print(dist_val)
 
 
 
@@ -465,20 +454,20 @@ def victimAnalysis():
     data['Crime_Count'] = data.groupby('District_Name')['FIRNo'].transform('count')
     data['Average_Severity'] = data.groupby('District_Name')['Arrested Count\tNo.'].transform('mean')
     high_risk_threshold = np.percentile(data['Crime_Count'], 50)
-    print(high_risk_threshold)
+    #print(high_risk_threshold)
     data['High_Risk_Area'] = (data['Crime_Count'] >= high_risk_threshold).astype(int)
 
 
     highrisk = data[data['High_Risk_Area']==1]
     highrisk=highrisk.drop_duplicates(subset=['Crime_Count','District_Name','UnitName'])
-    # print(highrisk.loc[:,['latitude']])
-    # print('*'*100)
-    print(highrisk.columns)
+    # #print(highrisk.loc[:,['latitude']])
+    # #print('*'*100)
+    #print(highrisk.columns)
     lati=highrisk.latitude.tolist()
     longi=highrisk.longitude.tolist()
     name=highrisk.Village_Area_Name.tolist()
-    print('*'*100)
-    print(name)
+    #print('*'*100)
+    #print(name)
     ls=[]
     for i in range(len(lati)):
         dic=dict() 
@@ -492,14 +481,14 @@ def victimAnalysis():
         # a=lll.iloc[i,0]
         # b=lll.iloc[i,1]
         ls.append(dic)
-    print("*******************************************************************************")
-    print(ls)
+    #print("*******************************************************************************")
+    #print(ls)
 
     points=ls
-    print(points)
+    #print(points)
 
 
-    print("*******************************************************************************")
+    #print("*******************************************************************************")
   
 
 
@@ -513,9 +502,9 @@ def victimAnalysis1():
     ls=pf[['District_Name', 'UnitName', 'FIRNo', 'Year', 'Month', 'VictimName', 'age_y', 'Caste_y','Profession_y', 'Sex_y', 'PresentCity_y', 'PresentState_y','crime_no','PersonType', 'InjuryType', 'Arr_ID_y', 'Victim_ID']]
     ls=ls.drop_duplicates()
     sex_distribution = ls['Sex_y'].value_counts()
-    print("***************")
-    print(sex_distribution)
-    print("******************") 
+    #print("***************")
+    #print(sex_distribution)
+    #print("******************") 
 
     district = request.form['district']
     place = request.form['places']
@@ -544,8 +533,8 @@ def victimAnalysis1():
     sex_idx=[[count] for count in sexidx] 
     sex_idx = [int(count) if isinstance(count, np.int64) else count for count in sexidx]
 
-    print(sex_val) 
-    print(sex_idx)
+    #print(sex_val) 
+    #print(sex_idx)
 
 
     prof=ls.Profession_y.value_counts().iloc[:10]
@@ -592,8 +581,8 @@ def victimAnalysis1():
     unit_idx=[[count] for count in unitidx] 
     unit_idx = [int(count) if isinstance(count, np.int64) else count for count in unitidx]
 
-    print(unit_idx)
-    print(unit_val)
+    #print(unit_idx)
+    #print(unit_val)
 
 
 
@@ -609,8 +598,8 @@ def victimAnalysis1():
     dist_idx=[[count] for count in distidx] 
     dist_idx = [int(count) if isinstance(count, np.int64) else count for count in distidx]
 
-    print(dist_idx)
-    print(dist_val)
+    #print(dist_idx)
+    #print(dist_val)
 
 
 
@@ -620,20 +609,20 @@ def victimAnalysis1():
     data['Crime_Count'] = data.groupby('District_Name')['FIRNo'].transform('count')
     data['Average_Severity'] = data.groupby('District_Name')['Arrested Count\tNo.'].transform('mean')
     high_risk_threshold = np.percentile(data['Crime_Count'], 50)
-    print(high_risk_threshold)
+    #print(high_risk_threshold)
     data['High_Risk_Area'] = (data['Crime_Count'] >= high_risk_threshold).astype(int)
 
 
     highrisk = data[data['High_Risk_Area']==1]
     highrisk=highrisk.drop_duplicates(subset=['Crime_Count','District_Name','UnitName'])
-    # print(highrisk.loc[:,['latitude']])
-    # print('*'*100)
-    print(highrisk.columns)
+    # #print(highrisk.loc[:,['latitude']])
+    # #print('*'*100)
+    #print(highrisk.columns)
     lati=highrisk.latitude.tolist()
     longi=highrisk.longitude.tolist()
     name=highrisk.Village_Area_Name.tolist()
-    print('*'*100)
-    print(name)
+    #print('*'*100)
+    #print(name)
     ls=[]
     for i in range(len(lati)):
         dic=dict() 
@@ -647,13 +636,13 @@ def victimAnalysis1():
         # a=lll.iloc[i,0]
         # b=lll.iloc[i,1]
         ls.append(dic)
-    print("*******************************************************************************")
-    print(ls)
+    #print("*******************************************************************************")
+    #print(ls)
 
     points=ls
 
 
-    print("*******************************************************************************")
+    #print("*******************************************************************************")
   
 
 
@@ -673,39 +662,18 @@ def timeSeries():
     # dateidx=prediction.index.date.tolist()
     dateidx=crime_count.index.date
     dataval=crime_count.values.tolist()
-    print('*'*100)
-    print(dateidx)
+    #print('*'*100)
+    #print(dateidx)
     dateidx=[[(dateidx[i].strftime('%Y-%m')),dataval[i]] for i in range(len(dateidx))]
-    print(dateidx)
+    #print(dateidx)
 
 
     dateYear=dateidx
-    # dateMonth=dateidx[1]
-    # print(dateYear)
-    # print(dateMonth)
-
-
-    # def get_month_number(year, month):
-    #     start_year = 2024
-    #     start_month = 4
-
-    #     # Calculate the number of months from the starting year and month
-    #     months_passed = (year - start_year) * 12 + (month - start_month) + 1
-
-    #     return months_passed
-
-    # # Example usage:
-    # for i in range(len(dateidx)):
-    #     year = int(dateidx[i][0])
-    #     month = int(dateidx[i][1])
-    #     result = get_month_number(year, month)
-    #     print("Number of months passed since the starting date:", result)
-
-
+ 
 
     dateYear_val_json = json.dumps(dateidx)
 
-    # print(prediction)
+    # #print(prediction)
     return render_template("timeSeries.html",data=dateYear_val_json)
 
 
@@ -716,12 +684,21 @@ def timeSeries():
 def TimeSeries1():
     # Check if the 'date' key exists in the form data
     date = request.form.get('date')
+    min_date=datetime.datetime(2024,5,1)
+    # #print("3"*800)
+    # #print(date)
+    # #print("3"*80)
+    date_time = datetime.datetime.strptime(date, '%Y-%m-%d')
+    if(date_time<min_date):
+        # return jsonify({"error":"Invalid Date"}),400
+        return "<h1 style='text-align:center;margin-top:300;color:#ff0000;'>Enter the date from May of this year</h1>"
+    if date=="":
+        return jsonify({'error': 'Date not found in form data'}), 400
+    
     date = date.split("-")
     month = date[1]
     year = date[0]
-    if date is None:
-        return jsonify({'error': 'Date not found in form data'}), 400
-    
+
     def get_month_number(year, month):
         start_year = 2024
         start_month = 4
@@ -737,12 +714,12 @@ def TimeSeries1():
     ss=predict.index.to_list()
     ss=[i.strftime('%Y-%m') for i in ss]
     predict=[int(i) for i in predict.values]
-    # print(predict,ss)
-    # print('*'*100)
+    # #print(predict,ss)
+    # #print('*'*100)
     dateidx=[[ss[i],predict[i]] for i in range(len(ss))]
-    print("***********************************************************")
-    print(dateidx)
-    print("***********************************************************")
+    #print("***********************************************************")
+    #print(dateidx)
+    #print("***********************************************************")
 
 
 
@@ -769,7 +746,7 @@ def AccusedAnalysisModel1():
     an=request.form['age']
     gn=request.form['gender']
     pro=request.form['profession']
-    print(dt,pn,cn,an,gn,pro) 
+    #print(dt,pn,cn,an,gn,pro) 
     dataset=pf
     le1 = LabelEncoder().fit(dataset['District_Name'])
     le2 = LabelEncoder().fit(dataset['UnitName'])
@@ -786,22 +763,22 @@ def AccusedAnalysisModel1():
     d=le4.transform([gn])
     e=le5.transform([pro])
     f=scaler.transform([[an]])
-    print('*'*100)
-    print(a,b,c,d,e,f)
+    #print('*'*100)
+    #print(a,b,c,d,e,f)
     dataframe=pd.DataFrame({'District_Name':a[0],'UnitName':b[0],'age_x':f[0],'Caste_x':c[0],'Profession_x':e[0],'Sex_x':d[0]})
     prediction=model.predict(dataframe)
     output=""
     if(prediction[0]==1):
-        print('hi will commit into the crime')
+        #print('hi will commit into the crime')
         output="will commit into the crime"
     else:
-        print('He will not commit into the crime .')
+        #print('He will not commit into the crime .')
         output="will not commit into the crime "
     if(gn=='FEMALE'):
         output='She '+output
     elif(gn=='MALE'):
         output='He '+output
-    print(gn)
+    #print(gn)
     return render_template("accusedAnalysisModel.html",districts=dir,profession=prof,cast=cast,occupation=occup,output=output)
 
 
@@ -812,4 +789,4 @@ def AccusedAnalysisModel1():
 
 
 if(__name__=="__main__"):
-    app.run(debug=True,port=200,host='0.0.0.0')  
+    app.run(debug=True,port=600,host='0.0.0.0')  
