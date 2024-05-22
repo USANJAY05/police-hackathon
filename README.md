@@ -1,9 +1,4 @@
-<html>
-  <head>
-    <title>KPH</title>
-  </head>
-  <body>
-    <h1>Karnataka Police Hackathon Crime Analysis Project</h1>
+<h1>Karnataka Police Hackathon Crime Analysis Project</h1>
 <a href="http://172.188.97.56:8080"><img src="https://drive.usercontent.google.com/download?id=16SAt9JdWOdr2fRX3zN0FjqQoosCZYgNC"></a>
 <h2>Click the image to view the website 👆</h2>
 <h2>Download the CSV and include in this folder</h2>
@@ -21,29 +16,10 @@
   <li>statsmodels</li>
 </ul>
 <h3>You can run the app locally using docker</h3>
-    <p id="textToCopy" onclick="copyText('docker pull usanjay05/crimexsura-kph:latest')">docker pull usanjay05/crimexsura-kph:latest</p>
+<ol>
+  <li>docker pull usanjay05/crimexsura-kph:latest</li>
+  <li>docker run -it --name name-of-container -p 8080:8080 usanjay05/crimexsura-kph:latest</li>
+</ol>
+
 <p>use (python3 app.py) to run the app</p>
-
-<script>
-    function copyText() {
-        // Get the element by its ID or any other selector
-        var element = document.getElementById("textToCopy");
-
-        // Create a range to select the text
-        var range = document.createRange();
-        range.selectNode(element);
-
-        // Select the text inside the range
-        window.getSelection().removeAllRanges(); // Clear previous selections
-        window.getSelection().addRange(range);
-
-        // Copy the selected text
-        document.execCommand("copy");
-
-        // Deselect the text to avoid further complications
-        window.getSelection().removeAllRanges();
-    }
-</script>
-  </body>
-</html>
 
