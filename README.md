@@ -1,4 +1,9 @@
-<h1>Karnataka Police Hackathon Crime Analysis Project</h1>
+<html>
+  <head>
+    <title>KPH</title>
+  </head>
+  <body>
+    <h1>Karnataka Police Hackathon Crime Analysis Project</h1>
 <a href="http://172.188.97.56:8080"><img src="https://drive.usercontent.google.com/download?id=16SAt9JdWOdr2fRX3zN0FjqQoosCZYgNC"></a>
 <h2>Click the image to view the website 👆</h2>
 <h2>Download the CSV and include in this folder</h2>
@@ -39,3 +44,6 @@
         window.getSelection().removeAllRanges();
     }
 </script>
+  </body>
+</html>
+
