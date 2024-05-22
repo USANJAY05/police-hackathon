@@ -4,4 +4,15 @@
 <h2>Download the CSV and include in this folder</h2>
 <a href="https://drive.google.com/file/d/1iCvyzlVHNSP6cdhdMkhvkIVy3OP3tFBA/view?usp=sharing">Click here to download CSV</a>
 <br>
-use (python3 app.py) to run the app
+<ul>
+  <h2>Install the packages</h2>
+  <li> flask</li>
+  <li>numpy</li>
+  <li>pandas</li>
+  <li>scipy</li>
+  <li>scikit-learn</li>
+  <li>matplotlib</li>
+  <li>seaborn</li>
+  <li>statsmodels</li>
+</ul>
+<p>use (python3 app.py) to run the app</p>
