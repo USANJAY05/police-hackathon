@@ -15,4 +15,27 @@
   <li>seaborn</li>
   <li>statsmodels</li>
 </ul>
+<h3>You can run the app locally using docker</h3>
+    <p id="textToCopy" onclick="copyText('docker pull usanjay05/crimexsura-kph:latest')">docker pull usanjay05/crimexsura-kph:latest</p>
 <p>use (python3 app.py) to run the app</p>
+
+<script>
+    function copyText() {
+        // Get the element by its ID or any other selector
+        var element = document.getElementById("textToCopy");
+
+        // Create a range to select the text
+        var range = document.createRange();
+        range.selectNode(element);
+
+        // Select the text inside the range
+        window.getSelection().removeAllRanges(); // Clear previous selections
+        window.getSelection().addRange(range);
+
+        // Copy the selected text
+        document.execCommand("copy");
+
+        // Deselect the text to avoid further complications
+        window.getSelection().removeAllRanges();
+    }
+</script>
