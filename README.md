@@ -16,3 +16,9 @@
   <li>statsmodels</li>
 </ul>
 <p>use (python3 app.py) to run the app</p>
+<hr>
+<h3>You can run the app locally using docker</h3>
+<ol>
+  <li>docker pull usanjay05/crimexsura-kph:latest</li>
+  <li>docker run -it --name name-of-container -p 8080:8080 usanjay05/crimexsura-kph:latest</li>
+</ol>
