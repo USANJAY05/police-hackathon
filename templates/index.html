@@ -1,0 +1,343 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script defer type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script defer src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <title>Crime Analysis</title>
+</head>
+<style>
+    body{
+        overflow-y: hidden;
+
+    }
+    .navbar{
+        display: none;
+    }
+    .navbar{
+        position: fixed;
+        z-index: 100;
+    }
+    #map{
+        position: relative;
+        z-index: 0;
+    }
+    .btn-group-m{
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .btn-group-m .group-m{
+        padding: 15px;
+        font-size: 1.3em;
+    }
+    .btn-group-inp{
+        display: none;
+    }
+    @media (max-width:700px) {
+        .btn-group{
+        display: none;
+    }
+    .btn-group-inp{
+        display:block;
+        height: 45px;
+    }
+    .btn-group-inp form{
+        flex-direction: row;
+        background-color: rgb(0, 0, 0);
+        
+    }
+    .select-option-m{
+        display: inline-block;
+        width: 24%;
+        padding: 0px;
+        height: 100%;
+    }
+    .select-option-m .select-option{
+        display: block;
+        width: 100%;
+        background-color: rgb(0, 0, 0);
+    }
+    .select-option-m button{
+        width: 100%;
+        margin: 0px;
+    }
+    .navbar{
+        display: block;
+    }
+    /* .details{
+        margin-top: 20px;
+        padding: 10px;
+        background-color: rgb(0, 0, 0);
+    }
+    .details div{
+        overflow-y: auto;
+        background-color: green;
+    } */
+    }
+
+
+</style>
+<body class="bg-secondary">
+<header class="bg-dark">
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <h1 class="text-white">Crime Analsis</h1>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Crime Analysis</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body mobile-view">
+            <div class="btn-group-m">
+                <button id="triggerButton0-m" type="button" class="group-m">Accused Analysis</button>
+                <button id="triggerButton1-m" type="button" class="group-m">Victim Analysis</button>
+                <button id="triggerButton2-m" type="button" class="group-m">Time Series</button>
+              </div>
+        
+
+
+              <!-- mobile details
+            <div class="details">
+                <h1>Crimes</h1>
+                <div class="bg-black p-2 d-flex flex-column gap-3">
+                    {%for i in crime_list%}
+                    <details class="list-group-item bg-dark text-white p-2">
+                        <summary style="-webkit-details-marker: none;">
+                            <h5>{{i[0]}}</h5>
+                        </summary>
+                        <h6 class="intendation">Time : {{i[1]}}</h5>
+                        <h6 class="intendation">Date: {{i[2]}}</h5>
+                        <h6 class="intendation">place of offence: {{i[3]}}</h5>
+                    </details>
+                    {%endfor%}
+                </div>
+
+
+            </div> -->
+        </div>
+        </div>
+    </div>
+    </nav>
+        <h1 class="text-white">Crime Analysis</h1>
+        <!-- <input type="file" name="" value="Upload" id=""> -->
+        
+    </header>
+    <main class="d-flex flex-column">
+        <section class="left-section  overflow-auto">
+            <div class="bg-black p-1 position-sticky">
+                <h3 class="text-light">Filters</h3>
+                <small class="text-secondary">Use the following to filter the dashboard elements to a specific police division, district, crime type, or time period.</small>
+            </div>
+            <form action="{{url_for('crimeType')}}" method="post">
+
+            <div class="select-option p-2 bg">
+                <label for="district">Select District:</label>
+                <select id="districts" class="select-option" name="district">
+                    <option value="">ALL</option>
+                    {%for i in districts%}
+                        <option value="{{i}}">{{i}}</option>
+                    {%endfor%}
+                </select>
+            </div>
+
+            <div class="select-option p-2">
+                <label for="places">Select places:</label>
+                <select class="select-option" id="places" name="places" >
+                    <option value="">All</option>
+
+                </select>
+            </div>
+            <div class="select-option p-2">
+                <label for="crimeType">Select Crime Type:</label>
+                <select class="select-option" id="crimeType" name="crimeType" >
+                    <option value="">All</option>
+                    
+                </select>
+            </div>
+            <button class="btn btn-primary btn-lg submit-btn " style="border-radius: 0px;">Submit</button>
+
+            </form>
+ 
+            
+
+
+            
+        </section>
+
+
+        <section class="middle-section">
+            <div class="middle-section-top">
+                <div id="map" style="width: 100%; height: 100%;"></div>
+
+            </div>
+            <div class="middle-section-bottom">
+                    <div id="columnchart_values" style="background-color:white;width: 100%; height: 90%;display: flex;justify-content: center;"></div>
+
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button id="triggerButton0" type="button" class="btn btn-primary border">Accused Analysis</button>
+                        <button id="triggerButton1" type="button" class="btn btn-primary border">Victim Analysis</button>
+                        <button id="triggerButton2" type="button" class="btn btn-primary border">Time Series</button>
+                    </div>
+
+                    <div class="btn-group-inp" role="group" aria-label="Basic example">
+                        <form action="{{url_for('crimeType')}}" method="post">
+
+                            <div class="select-option-m bg">
+                                <select id="districts-m" class="select-option" name="district">
+                                    <option value="">District</option>
+                                    {%for i in districts%}
+                                        <option value="{{i}}">{{i}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                
+                            <div class="select-option-m">
+                                <select class="select-option" id="places-m" name="places" >
+                                    <option value="">Place</option>
+                
+                                </select>
+                            </div>
+                            <div class="select-option-m">
+                                <select class="select-option" id="crimeType-m" name="crimeType" >
+                                    <option value="">CrimeType</option>
+                                    
+                                </select>
+                            </div>
+                            <div class="select-option-m">
+                                <button class="btn btn-primary" style="border-radius: 0px;">Submit</button>
+                            </div>
+                
+                        </form>
+                    </div>
+            </div>
+
+        </section>
+
+
+        <section class="right-section">
+            <div class="bg-black p-3 d-flex flex-column gap-3 ">
+                <div class="position-sticky top-0 bg-black">
+                    <h2 class="text-white">Crimes</h2>
+                    <h1 class="text-white text-center display-3 bold">{{crimeCount}}</h1>
+                </div>
+                    
+            </div>
+            <div class="right-btn">
+                <div class="bg-black p-2 d-flex flex-column gap-3">
+                    {%for i in crime_list%}
+                    <details class="list-group-item bg-dark text-white p-2">
+                        <summary style="-webkit-details-marker: none;">
+                            <h5>{{i[0]}}</h5>
+                        </summary>
+                        <h6 class="intendation">Time : {{i[1]}}</h5>
+                        <h6 class="intendation">Date: {{i[2]}}</h5>
+                        <h6 class="intendation">place of offence: {{i[3]}}</h5>
+                        </details>
+                    {%endfor%}
+                </div>
+
+
+            </div>
+            
+        </section>
+    </main>
+    <script>
+        
+
+// Create a map centered around Karnataka
+var map = L.map('map').setView([13.9716, 77.5946], 6);
+
+// Add OpenStreetMap base layer to the map
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+// Sample points in Karnataka with number of crimes
+var points = {{ points | tojson }};
+
+// Array to store coordinates of points
+var pointCoordinates = [];
+
+// Function to calculate marker color based on number of crimes
+function getMarkerColor(crimes) {
+    var opacity = Math.min(crimes / 100, 1); // Normalize crimes to range 0-100
+    console.log(crimes)
+    var color = 'rgba(255, 0, 0, ' + opacity + ')'; // Red color with opacity
+    return color;
+}
+
+// Plot the points on the map and collect coordinates
+points.forEach(point => {
+    var markerColor = getMarkerColor(point.crimes);
+    L.marker(point.coordinates, { icon: L.divIcon({ html: '<div style="background-color: ' + "red" + '; width: 25px; height: 25px; border-radius: 50%;"></div>' }) }).addTo(map)
+        .bindPopup(point.name + '<br>Crimes: ' + point.crimes);
+    pointCoordinates.push(point.coordinates); // Collect coordinates
+});
+
+// Fit the map to the bounds of the points
+var bounds = L.latLngBounds(pointCoordinates);
+map.fitBounds(bounds);
+
+
+
+
+
+
+
+
+google.charts.load("current", {packages:['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+
+function drawChart() {
+    var chartData = {{ chart | safe }};
+    var crimeBar={{crimeBar|safe}}
+
+    console.log(crimeBar)
+  var data = google.visualization.arrayToDataTable([
+    ["Element", "Cases", { role: "style" } ],
+    [crimeBar[0], chartData[0], "#b87333"],
+    [crimeBar[1], chartData[1], "silver"],
+    [crimeBar[2],chartData[2], "gold"],
+    [crimeBar[3],chartData[3], "color: #e5e4e2"],
+    [crimeBar[4],chartData[4], "color: blue"],
+    ["OTHERS",chartData[5], "color: RED"]
+
+  ]);
+
+  var view = new google.visualization.DataView(data);
+  view.setColumns([0, 1,
+                   { calc: "stringify",
+                     sourceColumn: 1,
+                     type: "string",
+                     role: "annotation" },
+                   2]);
+
+  var options = {
+    title: "Crime List",
+    width: '100%',
+    height: '100%',
+    bar: {groupWidth: "95%"},
+    legend: { position: "none" },
+    backgroundColor:"white",
+    
+  };
+  var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+  chart.draw(view, options);
+}
+
+
+
+    </script>
+</body>
+</html>

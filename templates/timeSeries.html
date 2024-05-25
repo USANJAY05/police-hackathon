@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script defer type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <title>Time Series</title>
+</head>
+<style>
+        #line_top_x{
+        /* box-shadow: 0px 0px 10px; */
+        padding: 10px;
+        border-radius: 10px;
+        width: 100%;
+        height: 500px;
+
+    }
+    body{
+        gap: 0px;
+        overflow: auto;
+    }
+
+    .main{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-items: center;
+        row-gap: 50px;
+        overflow: auto;
+        padding: 25px 0px;
+    }
+    
+
+    
+</style>
+<body>
+    <header class="bg-dark">
+        <div style="display: flex;gap:10px;align-items: center;">
+            <button class="backButton" onclick="location.href='/'">&#x25c0;</button>
+            <h1 class="text-white">Time Series</h1>
+        </div>
+
+
+    </header>
+</head>
+
+<main class="main">
+    <form action="{{url_for('TimeSeries1')}}" method="post">
+        <input type="date" name="date" id="datePicker" required> <!-- Add name="date" -->
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    
+    <div id="line_top_x"></div>
+
+</main>
+
+
+
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var crimeData = {{ data|safe }};
+        var error={{error|safe}}
+        console.log(error)
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Year');
+        data.addColumn('number', 'Crime Count');
+
+        // Adding rows to DataTable
+        for (var i = 0; i < crimeData.length; i++) {
+            data.addRow(crimeData[i]);
+        }
+
+        var options = {
+    title: 'Time Series',
+    curveType: 'none', // Set curveType to 'none' for sharp edges
+    legend: { position: 'bottom' },
+    pointSize: 5, // Set pointSize to display data points
+    tooltip: 'selection'  // Show data points on hover
+};
+
+
+
+        var chart = new google.visualization.LineChart(document.getElementById('line_top_x'));
+
+        chart.draw(data, options);
+    }
+</script>
+
+
+</body>
+</html>
